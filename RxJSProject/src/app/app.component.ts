@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { timer } from 'rxjs';
+import { range } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,12 +10,11 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
   constructor() {
-    const publisher = timer(1000, 2000); //interval gibi aslında bağlandıktan 1 sn sonra çalış ve her 2 sn de bir çalışmaya devam et demek
-    //2.kullanımı ise timer(1000); //timer subscribe olduktan sonra vermiş olduğumuz süre sonra 1 kere  çalış demek ve ardından tamamlanır
+    const publisher = range(1, 20); //range  belirtilen başlangıçtan 2 değere kadar değerleri yayar. 1,2...20
     this.subscription = publisher.subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
-        console.log('sedat ' + data); //data her 1 sn de b,r değişecek ve 0,1,2... sonsuza kadar devam eder 1s aralıklarla unscribe olana kadar
+        console.log('gelen deger: ' + data);
       },
       (err) => {
         console.log(err);
