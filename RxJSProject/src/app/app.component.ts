@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { of } from 'rxjs';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +10,19 @@ export class AppComponent {
   title = 'RxJSProject';
 
   constructor() {
-    const values = of('sedat', 27, [1, 2, 3]); //of vermiş olduğumuz değerleri subscribe olunabilecek observable türüne dönüştürür
-    values.subscribe((data) => {
-      console.log(data);
-    });
+    const publisher = interval(1000); //interval vermiş olduğumuz  sürede bir çalışır
+
+    publisher.subscribe(
+      //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+      (data) => {
+        console.log('sedat ' + data);//data her 1 sn de b,r değişecek ve 0,1,2... sonsuza kadar devam eder 1s aralıklarla unscribe olana kadar
+      },
+      (err) => {
+        console.log(err);
+      },
+      () => {
+        console.log('veri alma işlemi bitti');
+      }
+    );
   }
 }
