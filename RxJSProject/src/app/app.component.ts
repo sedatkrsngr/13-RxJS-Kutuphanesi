@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { range,from } from 'rxjs';
+import { of,defer } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,14 +10,12 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
   constructor() {
-    const map = new Map();//c# ta bulunan dictionary ile aynı key,value
-    map.set(1,"Kitaplar");
-    map.set(2,"Kalemler");
-    const publisher = from(map) //of operatorundan farkı içine dizi alır ve absorvable nesnesine dönüştürür
+
+    const publisher =defer(()=>of(new Date()));//defer ile tarih işlemleri kullanıldığında. Veriyi aldığımız andaki zamanı bize gösterir
     this.subscription = publisher.subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
-        console.log(`${data[0]}=${data[1]}`);
+        console.log(data);
 
       },
       (err) => {
