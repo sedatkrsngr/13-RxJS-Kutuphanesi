@@ -1,26 +1,23 @@
-import { Component } from '@angular/core';
-import { of,defer, Observable } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { fromEvent } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   title = 'RxJSProject';
-  subscription: any;
-  constructor() {
-    const myObservable=new Observable(o=>{//Yeni bir obsarvable nesnesi üretiyoruz ve sırasıyla alınacak değerleri veriyoruz
-      o.next("sedat");
-      o.next("karasungur");
-      o.complete();
-    });
-     this.subscription = myObservable.subscribe(
-      //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
-      (data) => {
-        console.table(data);
 
+  @ViewChild('btn') button!: ElementRef; //bu ikili ile btn elementini button değişkenine atar ardından işlem yapabiliriz.
+
+  constructor() {}
+  ngAfterViewInit(): void {//Htmller oluştuktan sonra çalışacak method(oluşturduğumuz btn bu şekilde ulaşırız)
+
+    fromEvent(this.button.nativeElement, 'click').subscribe( //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+      (data) => {     //data eventin herşeyini gösterir
+
+        console.log(data);
       },
       (err) => {
         console.log(err);
@@ -29,9 +26,5 @@ export class AppComponent {
         console.log('veri alma işlemi bitti');
       }
     );
-  }
-
-  stopSubscribe() {//html tarafında butona basarak veri almayı durduruyoruz
-    this.subscription.unsubscribe();
   }
 }
