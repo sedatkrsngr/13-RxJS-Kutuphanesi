@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { of,defer } from 'rxjs';
+import { ajax } from 'rxjs/ajax';
 
 @Component({
   selector: 'app-root',
@@ -10,12 +11,11 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
   constructor() {
-
-    const publisher =defer(()=>of(new Date()));//defer ile tarih işlemleri kullanıldığında. Veriyi aldığımız andaki zamanı bize gösterir
-    this.subscription = publisher.subscribe(
+//Bildiğimiz ajax isteği yapar. ajax({}); //ile jquery gibi url,method şeklinde de kullanabiliriz.
+     this.subscription = ajax.getJSON("https://jsonplaceholder.typicode.com/todos/1").subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
-        console.log(data);
+        console.table(data);
 
       },
       (err) => {
