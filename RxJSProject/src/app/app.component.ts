@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { from, interval, pipe, timer } from 'rxjs';
-import { skipUntil, skipWhile } from 'rxjs/operators';
+import { skipUntil, skipWhile, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -13,11 +13,11 @@ export class AppComponent {
 
   constructor() {
     //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
-    //skipwhile belirtilen şartı sağlayanları atlayacak. Aşağıdaki 5,6 sonucu verir
+    //take parametre olarak int değer alır ve dizin içerisinde belirtilen ilk n kadarını alır
 
     var values = from([1, 2, 3, 4, 5, 6]);
 
-    values.pipe(skipWhile(x=>x<5)).subscribe(
+    values.pipe(take(3)).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
