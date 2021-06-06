@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { from, interval, pipe, timer } from 'rxjs';
-import { throttle, throttleTime } from 'rxjs/operators';
+import { from } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -10,13 +10,13 @@ import { throttle, throttleTime } from 'rxjs/operators';
 export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
+  //Map>gelen datalar üzerinde işlem yapmak için kullanılan methodtur.
+  //Yani hangi datayı işler ve belirttiği dataları yayınlar
+  //Mesela apiden sadece ad alanı gösterilsin desek dahi onu da burada hallederiz
 
   constructor() {
-    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
-   const myInterval = interval(1000);
-
-    //throttleTime içerisindeki süreye  çalıştığı andaki datayı alır. Yani ilk 0,3,6,9..... Throttle(methodlar alır) den farkı sadece süre alır
-    myInterval.pipe(throttleTime(2000)).subscribe(
+    const values = from([1, 2, 3, 4, 5, 6]);
+    values.pipe(map(val=>val+10)).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
