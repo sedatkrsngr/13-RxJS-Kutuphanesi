@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { from, interval, pipe, timer } from 'rxjs';
-import { skipUntil, skipWhile, take, takeLast, takeWhile } from 'rxjs/operators';
+import { throttle } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -13,11 +13,10 @@ export class AppComponent {
 
   constructor() {
     //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
-    //takewhile  dizin içerisinde belirtilenşartı sağlayanları alır
+   const myInterval = interval(1000);
 
-    var values = from([1, 2, 3, 4, 5, 6]);
-
-    values.pipe(takeWhile(x=>x<3)).subscribe(
+    //throttle içerisindeki method çalıştığı andaki datayı alır. Yani ilk 0,3,6,9....
+    myInterval.pipe(throttle(x=>interval(2000))).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
