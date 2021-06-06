@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { from, pipe } from 'rxjs';
-import { find, first,filter } from 'rxjs/operators';
+import { find, first,filter,last } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,10 +14,11 @@ export class AppComponent {
   constructor() {
     const myArray = from([5, 10, 15, 20, 50, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
 
-    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır. Filter ise belirtiğimiz şarta göre ilk nesneleri getirir.
-    //Filterin -> first ve findden farkı-> Geriye birden fazla değer döner.
-    //Ayrıca şartları sağlamayan veri yoksa hata fırlatmaz
-    myArray.pipe(filter((val) => val > 800)).subscribe(
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //Last ise belirtiğimiz şarta göre son nesneyi getirir.
+    //Last -> firstin  tam tersidir ve veri yoksa hata fırlatır
+
+    myArray.pipe(last((val) => val > 100)).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
