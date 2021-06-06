@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { from, interval, pipe, timer } from 'rxjs';
-import { throttle } from 'rxjs/operators';
+import { throttle, throttleTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -15,8 +15,8 @@ export class AppComponent {
     //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
    const myInterval = interval(1000);
 
-    //throttle içerisindeki method çalıştığı andaki datayı alır. Yani ilk 0,3,6,9....
-    myInterval.pipe(throttle(x=>interval(2000))).subscribe(
+    //throttleTime içerisindeki süreye  çalıştığı andaki datayı alır. Yani ilk 0,3,6,9..... Throttle(methodlar alır) den farkı sadece süre alır
+    myInterval.pipe(throttleTime(2000)).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
