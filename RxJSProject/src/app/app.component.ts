@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { from, of } from 'rxjs';
-import { delay, map, mergeMap, switchMap } from 'rxjs/operators';
+import { concatMap, delay, map, mergeMap, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,7 @@ import { delay, map, mergeMap, switchMap } from 'rxjs/operators';
 export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
-  //SwitchMap->SqitchMaptan farkı her yeni veride önceki veriyi es geçip yeni veriyi işliyor
+  //ConcatMap->mergeMaptan farkı iç döngü bitince belirtilen gecikme ile yayınlar ardından sonraki döngü bitimini bekler
 
   constructor() {
     const values = of('a', 'b', 'c', 'd', 'e');
@@ -18,7 +18,7 @@ export class AppComponent {
 
     values
       .pipe(
-        switchMap((val) =>
+        concatMap((val) =>
           nums.pipe(
             delay(1000),
             map((num) => val + num)
@@ -29,7 +29,7 @@ export class AppComponent {
         //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
         (data) => {
           console.log(data);
-          //e1,e2 çıkan çıktı
+          //a1,a2 b1,b2 ... e1,e2 her iç döngü bitince bekleme yapar ve yayınlar
         },
         (err) => {
           console.log(err);
