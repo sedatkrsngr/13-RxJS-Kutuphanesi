@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { from } from 'rxjs';
-import { map, mapTo } from 'rxjs/operators';
+import { from, of } from 'rxjs';
+import { delay, map, mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -10,22 +10,34 @@ import { map, mapTo } from 'rxjs/operators';
 export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
-  //MapTo->gelen dataları yayınlamaz sadece verdiği değeri yayınlar
-  //Aşağıdaki örnekte sabitdeğer değerini yayınlar sadece
+  //MergeMap->maptan farkı geriye sabit bir değer değil de absorvable değer döner
+  //Absorvable değer döndüğü için döndüğü değerlere de subscribe olabiliyoruz ve iç içe subscribelerden daha efektif yazmış oluruz
 
   constructor() {
-    const values = from([1, 2, 3, 4, 5, 6]);
-    values.pipe(mapTo("sabitdeğer")).subscribe(
-      //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
-      (data) => {
-        console.log(data);
-      },
-      (err) => {
-        console.log(err);
-      },
-      () => {
-        console.log('veri alma işlemi bitti');
-      }
-    );
+    const values = of('a', 'b', 'c', 'd', 'e');
+    const nums = of(1, 2);
+
+    values
+      .pipe(
+        mergeMap((val) =>
+          nums.pipe(
+            delay(3000),
+            map((num) => val + num)
+          )
+        )
+      )
+      .subscribe(
+        //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+        (data) => {
+          console.log(data);
+          //a1,a2,b1,b2.....e1,e2 çıkan çıktı
+        },
+        (err) => {
+          console.log(err);
+        },
+        () => {
+          console.log('veri alma işlemi bitti');
+        }
+      );
   }
 }
