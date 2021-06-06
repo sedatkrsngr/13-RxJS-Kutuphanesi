@@ -1,21 +1,24 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { fromEvent } from 'rxjs';
+import { Component } from '@angular/core';
+import { from, pipe } from 'rxjs';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
   title = 'RxJSProject';
+  subscription: any;
 
-  @ViewChild('btn') button!: ElementRef; //bu ikili ile btn elementini button değişkenine atar ardından işlem yapabiliriz.
-
-  constructor() {}
-  ngAfterViewInit(): void {//Htmller oluştuktan sonra çalışacak method(oluşturduğumuz btn bu şekilde ulaşırız)
-
-    fromEvent(this.button.nativeElement, 'click').subscribe( //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
-      (data) => {     //data eventin herşeyini gösterir
+  constructor() {
+    const myArray = from([5, 10, 15, 20, 50, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır. first ise belirtiğimiz şarta göre ilk nesneyi getirir.
+    //eğer şart koymazsak içine o zaman ilk nesneyi getirir
+    myArray.pipe(first(val=>val>15)).subscribe(
+      //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+      (data) => {
+        //data eventin herşeyini gösterir
 
         console.log(data);
       },
@@ -27,4 +30,5 @@ export class AppComponent implements AfterViewInit {
       }
     );
   }
+
 }
