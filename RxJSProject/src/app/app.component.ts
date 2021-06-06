@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { from, of } from 'rxjs';
-import { concatMap, delay, map, mergeMap, switchMap } from 'rxjs/operators';
+import { from, interval, of } from 'rxjs';
+import { concatMap, delay, map, mergeMap, skip, switchMap, take, toArray } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -10,26 +10,17 @@ import { concatMap, delay, map, mergeMap, switchMap } from 'rxjs/operators';
 export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
-  //ConcatMap->mergeMaptan farkı iç döngü bitince belirtilen gecikme ile yayınlar ardından sonraki döngü bitimini bekler
+
 
   constructor() {
-    const values = of('a', 'b', 'c', 'd', 'e');
-    const nums = of(1, 2);
+  //ToArray->gelen veriyi  arraya çevirir
+    const values = interval(1000)
 
-    values
-      .pipe(
-        concatMap((val) =>
-          nums.pipe(
-            delay(1000),
-            map((num) => val + num)
-          )
-        )
-      )
-      .subscribe(
+      values.pipe(skip(3),take(5),toArray()).subscribe(
         //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
         (data) => {
           console.log(data);
-          //a1,a2 b1,b2 ... e1,e2 her iç döngü bitince bekleme yapar ve yayınlar
+          //[4,5,6,7,8] değerli dizi oluşturur
         },
         (err) => {
           console.log(err);
