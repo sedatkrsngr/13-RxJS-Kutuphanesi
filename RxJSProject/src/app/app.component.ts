@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, mapTo } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -10,13 +10,12 @@ import { map } from 'rxjs/operators';
 export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
-  //Map>gelen datalar üzerinde işlem yapmak için kullanılan methodtur.
-  //Yani hangi datayı işler ve belirttiği dataları yayınlar
-  //Mesela apiden sadece ad alanı gösterilsin desek dahi onu da burada hallederiz
+  //MapTo->gelen dataları yayınlamaz sadece verdiği değeri yayınlar
+  //Aşağıdaki örnekte sabitdeğer değerini yayınlar sadece
 
   constructor() {
     const values = from([1, 2, 3, 4, 5, 6]);
-    values.pipe(map(val=>val+10)).subscribe(
+    values.pipe(mapTo("sabitdeğer")).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
