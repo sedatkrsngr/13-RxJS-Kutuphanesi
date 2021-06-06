@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { from, fromEvent, interval, merge, of } from 'rxjs';
-import { mergeAll, startWith } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
+import {  } from 'rxjs/operators';
+import { ajax } from 'rxjs/ajax';
 
 @Component({
   selector: 'app-root',
@@ -11,16 +12,18 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
 
-  //startWith->arrayin ilk indexine data koymak için kullanılır
+  //forkJoin->içerisindeki observablelerin hepsinin birden yayınlamaları bitince hepsinin tüm değerlerini kendisi yayınlıyor
 
   constructor() {
-    const myArray = from([1,2,3]);
 
-    myArray.pipe(startWith(4,5,6)).subscribe(
+forkJoin({
+ilkistek: ajax.getJSON<any>("https://jsonplaceholder.typicode.com/todos/1"),
+ikinciistek:ajax.getJSON<any>("https://jsonplaceholder.typicode.com/posts/1")
+}).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
-        //4,5,6,1,2,3
+
       },
       (err) => {
         console.log(err);
