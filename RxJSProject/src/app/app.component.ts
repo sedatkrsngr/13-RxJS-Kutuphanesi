@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { from, interval, of } from 'rxjs';
-import { concatMap, delay, map, mergeMap, skip, switchMap, take, toArray } from 'rxjs/operators';
+import { concatMap, delay, map, mergeMap, reduce, skip, switchMap, take, toArray } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -13,14 +13,16 @@ export class AppComponent {
 
 
   constructor() {
-  //ToArray->gelen veriyi  arraya çevirir
-    const values = interval(1000)
+  //raduce->gelen verileri işler ve tek bir sonuç döner
+  //aşağıdaki örn olduğu gibi 2 parametre ile oluşur acc başlangıçta etkisiz elemandır. Yaptığımız işleme göre sonraki veri geldiğinde değişir.
+  //acc işlemin sonucu yeni değeri olur. Yani aslında aşağıda dizinin elemanlarını topluyoruz
+    const values = of(1,2,3,4,5);
 
-      values.pipe(skip(3),take(5),toArray()).subscribe(
+      values.pipe(reduce((acc,val)=>acc+val)).subscribe(
         //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
         (data) => {
           console.log(data);
-          //[4,5,6,7,8] değerli dizi oluşturur
+          //15
         },
         (err) => {
           console.log(err);
