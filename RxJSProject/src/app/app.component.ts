@@ -1,6 +1,18 @@
 import { Component } from '@angular/core';
-import { concat, from, fromEvent, of } from 'rxjs';
-import { delay, delayWhen, finalize, tap, take, repeat, timeout, catchError, retry } from 'rxjs/operators';
+import { concat, from, fromEvent, interval, of } from 'rxjs';
+import {
+  delay,
+  delayWhen,
+  finalize,
+  tap,
+  take,
+  repeat,
+  timeout,
+  catchError,
+  retry,
+  map,
+  retryWhen,
+} from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 
 @Component({
@@ -12,11 +24,21 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
 
-  //retry->hata meydana gelirse observable n tekrar data almayı dener alamazsa hataya düşer
+  //retryWhen->retryden farkı içerisine observable nesne alır. Her seferinde tekrar eder
 
   constructor() {
-   const myAjax = ajax
-      .getJSON<any>('https://jsonplaceholder.typicode.com/todos/1').pipe(retry(3),catchError(err=>of("3 tekrardas data gelmedi"))).subscribe(
+    let myInterval = interval(1000)
+      .pipe(
+        map((val) => {
+          if (val > 6) {
+            throw "değer 6'dan büyük";
+          } else {
+            return val;
+          }
+        })
+      );
+
+      myInterval.pipe(retryWhen(err=>err.pipe(tap(x=>console.log(x))))).subscribe(
         //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
         (data) => {
           console.log(data);
