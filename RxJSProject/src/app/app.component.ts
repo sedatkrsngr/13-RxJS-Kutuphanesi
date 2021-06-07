@@ -1,26 +1,8 @@
 import { Component } from '@angular/core';
 import {
-  concat,
-  from,
-  fromEvent,
-  interval,
-  observable,
-  Observable,
-  of,
-  Subject,
+  AsyncSubject,
 } from 'rxjs';
 import {
-  delay,
-  delayWhen,
-  finalize,
-  tap,
-  take,
-  repeat,
-  timeout,
-  catchError,
-  retry,
-  map,
-  retryWhen,
 } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 
@@ -33,19 +15,14 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
 
-  //subject->observable nesnelerinin özelleştirilmiş tipidir. Observable nesnelerinin yetersiz kaldığı yerde devreye girerler
-  //İçinde çalıştırdığımız method tüm subscribler için ortaktır. Yani diyelim ki rastgele bir sayı üretiyor. Bunu 10 tane sub
-  //dinliyorsa hepsi aynı veriyi görür ama new observable deseydik her seferinde farklı veri görecektik
-  //Mutlaka next methodundan önce subscribe olması gerekiyor
+  //asyncsubject->subscribe olan yapılara en son yayınlanmış olan datayı gönderir.
+  //önemlik olan şu mutlaka complete methodu çalışmış olmalı
+  //aşağıdaki örn. complete 2. DEğer yazanda çalıştığı için 2 si de 2.değer yazısını görür
   constructor() {
 
-    const myObservable = new Observable(x=>{
-      x.next(Math.random());
-    });
+    const myObservableSub = new AsyncSubject();
 
-    const myObservableSub = new Subject();
-
-
+    myObservableSub.next("1. Değer");
 
     myObservableSub.subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
@@ -59,6 +36,9 @@ export class AppComponent {
         console.log('veri alma işlemi bitti');
       }
     );
+
+    myObservableSub.next("2. Değer");
+    myObservableSub.complete();
     myObservableSub.subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
@@ -71,6 +51,5 @@ export class AppComponent {
         console.log('veri alma işlemi bitti');
       }
     );
-    myObservableSub.next(Math.random());
   }
 }
