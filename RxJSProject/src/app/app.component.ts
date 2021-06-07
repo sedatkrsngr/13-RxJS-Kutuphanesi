@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { concat, from } from 'rxjs';
-import { delay,tap } from 'rxjs/operators';
+import { concat, from, fromEvent } from 'rxjs';
+import { delay, delayWhen, tap } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 
 @Component({
@@ -12,16 +12,14 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
 
-  //tab->akışı bozmadan dataları kullanma. Örn:Log atma
+  //delayWhen->Belirtilen fonksiyon çalışana kadar bekle demek
+  //Aşağıdaki örnekte ekranın herhangi bir yerine tıklayana kadar veri dinleme işi gerçekleşmez
 
   constructor() {
-    const values = from([1,2,3,4]);
-
-    values.pipe(tap(val=>console.log(val))).subscribe(
+    ajax.getJSON<any>('https://jsonplaceholder.typicode.com/todos/1').pipe(delayWhen(val=>fromEvent(document,"click"))).subscribe(
       //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
       (data) => {
         console.log(data);
-
       },
       (err) => {
         console.log(err);
