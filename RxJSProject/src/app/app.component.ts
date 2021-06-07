@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {
-  AsyncSubject, BehaviorSubject,
+  AsyncSubject, BehaviorSubject, ReplaySubject,
 } from 'rxjs';
 import {
 } from 'rxjs/operators';
@@ -15,11 +15,10 @@ export class AppComponent {
   title = 'RxJSProject';
   subscription: any;
 
-  //behaviorsubject->ilk oluşturulduğu anda mutlaka ilk değeri alır
-  //önce subs sonra subs farketmez hepsine sonraki dataya kadar dataları yayar
+  //replaysubject->subscribe olanlara son yayınlanmış olan n kadar dataları gönderir
   constructor() {
 
-    const myObservableSub = new BehaviorSubject("Başlangıç Değer");
+    const myObservableSub = new ReplaySubject(3);
 
 
     myObservableSub.subscribe(
