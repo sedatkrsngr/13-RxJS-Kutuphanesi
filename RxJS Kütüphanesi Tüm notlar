@@ -1,0 +1,808 @@
+****subscribe 
+.subscribe(
+      //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+      (data) => {
+        console.log('sedat ' + data);//data her 1 sn de b,r değişecek ve 0,1,2... sonsuza kadar devam eder 1s aralıklarla unscribe olana kadar
+      },
+      (err) => {
+        console.log(err);
+      },
+      () => {
+        console.log('veri alma işlemi bitti');
+      }
+    );
+
+
+****of operatoru
+constructor() {
+    const values = of('sedat', 27, [1, 2, 3]); //of vermiş olduğumuz değerleri subscribe olunabilecek observable türüne dönüştürür
+    values.subscribe((data) => {
+      console.log(data);
+    });
+  }
+
+****interval operatoru
+ constructor() {
+    const publisher = interval(1000); //interval vermiş olduğumuz  sürede bir çalışır
+	subscribe((data) => {
+      console.log(data);//data her 1 sn de b,r değişecek ve 0,1,2... sonsuza kadar devam eder 1s aralıklarla unscribe olana kadar
+    });
+  }
+
+****Timer Operatoru
+////component tarafı
+subscription: any;
+  constructor() {
+    const publisher = timer(1000, 2000); //1.kullanım interval gibi aslında bağlandıktan 1 sn sonra çalış ve her 2 sn de bir çalışmaya devam et demek
+    //2.kullanımı ise timer(1000); //timer subscribe olduktan sonra vermiş olduğumuz süre sonra 1 kere  çalış demek ve ardından tamamlanır
+    this.subscription = publisher.subscribe(
+      (data) => {
+        console.log('sedat ' + data); //data her 1 sn de b,r değişecek ve 0,1,2... sonsuza kadar devam eder 1s aralıklarla unscribe olana kadar
+      }
+    );
+  }
+
+  stopSubscribe() {//html tarafında butona basarak veri almayı durduruyoruz
+    this.subscription.unsubscribe();
+  }
+////html tarafı
+<button type="button" (click)="stopSubscribe()">Bağlanmayı durdur</button>
+
+****Range Operatoru
+////Component Tarafı
+
+subscription: any;
+  constructor() {
+    const publisher = range(1, 20); //range  belirtilen başlangıçtan 2 değere kadar değerleri yayar. 1,2...20
+    this.subscription = publisher.subscribe(
+      (data) => {
+        console.log('gelen deger: ' + data);
+      }
+    );
+  }
+
+  stopSubscribe() {//html tarafında butona basarak veri almayı durduruyoruz
+    this.subscription.unsubscribe();
+  }
+////Html Tarafı
+<button type="button" (click)="stopSubscribe()">Bağlanmayı durdur</button>
+
+****From Operatoru
+subscription: any;
+  constructor() {
+    const map = new Map();//c# ta bulunan dictionary ile aynı key,value
+    map.set(1,"Kitaplar");
+    map.set(2,"Kalemler");
+    const publisher = from(map) //of operatorundan farkı içine dizi alır ve absorvable nesnesine dönüştürür
+    this.subscription = publisher.subscribe(
+      (data) => {
+        console.log(`${data[0]}=${data[1]}`);
+      }
+    );
+  }
+
+  stopSubscribe() {//html tarafında butona basarak veri almayı durduruyoruz
+    this.subscription.unsubscribe();
+  }
+////Html Tarafı
+<button type="button" (click)="stopSubscribe()">Bağlanmayı durdur</button>
+
+
+****Defer Operatoru
+ subscription: any;
+  constructor() {
+    const publisher =defer(()=>of(new Date()));//defer ile tarih işlemleri kullanıldığında. Veriyi aldığımız andaki zamanı bize gösterir
+    this.subscription = publisher.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+  stopSubscribe() {//html tarafında butona basarak veri almayı durduruyoruz
+    this.subscription.unsubscribe();
+  }
+
+****Ajax Operatoru
+subscription: any;
+  constructor() {
+//Bildiğimiz ajax isteği yapar. ajax({}); //ile jquery gibi url,method şeklinde de kullanabiliriz.
+     this.subscription = ajax.getJSON("https://jsonplaceholder.typicode.com/todos/1").subscribe(
+      (data) => {
+        console.table(data);
+
+      }
+    );
+  }
+
+  stopSubscribe() {//html tarafında butona basarak veri almayı durduruyoruz
+    this.subscription.unsubscribe();
+  }
+
+****CreateObservable Operatoru
+subscription: any;
+ constructor() {
+	//Yeni bir obsarvable nesnesi üretiyoruz ve sırasıyla alınacak değerleri veriyoruz
+    const myObservable=new Observable(o=>{
+      o.next("sedat");
+      o.next("karasungur");
+      o.complete();
+    });
+     this.subscription = myObservable.subscribe(
+      (data) => {
+        console.table(data);
+      }
+    );
+  }
+
+  stopSubscribe() {//html tarafında butona basarak veri almayı durduruyoruz
+    this.subscription.unsubscribe();
+  }
+
+
+****fromEvent Operatoru
+////Component Tarafı
+ @ViewChild('btn') button!: ElementRef; //bu ikili ile btn elementini button değişkenine atar ardından işlem yapabiliriz.
+
+  constructor() {}
+  ngAfterViewInit(): void {//Htmller oluştuktan sonra çalışacak method(oluşturduğumuz btn bu şekilde ulaşırız önce htmllerin oluşmasını beklemeliyi<)
+
+    fromEvent(this.button.nativeElement, 'click').subscribe( 
+//eventlerden gelen bildirimleri fromEvent ile yakalarız   
+//From event eventimizde yapacağımız işlemleri belirtir.Örrn texte değer girilince veya butona tıklanınca anda çalışacak
+      (data) => {     //data eventin herşeyini gösterir
+        console.log(data);
+      }
+    );
+  }
+////Html Tarafı
+<button #btn type="button">Componentteki 'btn' Eventini Çalıştır</button>
+
+****Pipe/First Operatoru
+ subscription: any;
+
+  constructor() {
+    const myArray = from([5, 10, 15, 20, 50, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır. first ise belirtiğimiz şarta göre ilk nesneyi getirir.
+    //eğer şart koymazsak içine o zaman ilk nesneyi getirir
+    myArray.pipe(first(val=>val>15)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****Find Operatoru
+subscription: any;
+
+  constructor() {
+    const myArray = from([5, 10, 15, 20, 50, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır. find ise belirtiğimiz şarta göre ilk nesneyi getirir.
+    //Firstten farkları-> şart koymak gerekli ve şarta uymayan veri yoksa hata fırlatmaz ama firstte hata fırlatır ve error methoduna düşer
+    myArray.pipe(find((val) => val > 800)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****Filter  Operatoru
+ subscription: any;
+
+  constructor() {
+    const myArray = from([5, 10, 15, 20, 50, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
+
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır. Filter ise belirtiğimiz şarta göre ilk nesneleri getirir.
+    //Filterin -> first ve findden farkı-> Geriye birden fazla değer döner. //Ayrıca şartları sağlamayan veri yoksa hata fırlatmaz
+    myArray.pipe(filter((val) => val > 800)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****Last Operatoru
+subscription: any;
+
+  constructor() {
+    const myArray = from([5, 10, 15, 20, 50, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //Last ise belirtiğimiz şarta göre son nesneyi getirir.
+    //Last -> firstin  tam tersidir ve veri yoksa hata fırlatır
+    myArray.pipe(last((val) => val > 100)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****Single Operatoru
+ subscription: any;
+
+  constructor() {
+    const myArray = from([5, 10, 15, 20, 50, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
+
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //single ise belirtiğimiz şarta göre tek nesneyi getirir. Eğer şartı sağlayan birden fazla veri varsa uyarı verir,hata vermez.
+
+    myArray.pipe(single((val) => val==100)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****Distinct Operatoru
+ subscription: any;
+  constructor() {
+    const myArray = from([5, 10, 10, 20, 100, 100, 300, 600]); //içine dizi alan of methodu gibi düşün fromu
+
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //distinct ise gelen verideki tekrarlı verileri teke düşürür
+
+    myArray.pipe(distinct()).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****DebounceTime Operatoru (arama işlemlerinde kullanılabilir.)
+////Component Tarafı
+subscription: any;
+
+  @ViewChild('textSearch') textSerch!: ElementRef;//Viewchild HTml tarafındaki değerleri typescript tarafında yakalamaya yarar ve aşağıdakiyle ikilidir.  
+
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+  }
+  ngAfterViewInit(): void {//Html çalıştıktan sonra çalışır.Böylece #degerlerine ulaşabiliriz
+    //From event ise eventimizde yapacağımız işlemleri belirtir. Mesela aşaıda texte değer girildiği anda çalışacak
+    //Değer girildiğinde her bastığımızda işlem yapmasın belli bir süre bastıklarımızı toplu olarak işleme dahil etsin istiyorsak o zaman debounceTime kullanırız. Mesela aşağıda 300 ms içinde yazılanları işleme sokar. Arama işlemlerinde kullanılabilir
+    fromEvent<KeyboardEvent>(this.textSerch.nativeElement, 'keyup').pipe(debounceTime(300)).subscribe(
+      (data) => {
+        console.log((data.target as HTMLInputElement).value);
+      }
+    );
+  }
+////html tarafı
+<input #textSearch type="text">
+
+
+****Skip Operatoru
+subscription: any;
+
+  constructor() {
+	//pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+
+    var nums = from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+	//skip belirtilen ilk n değeri yok sayar yani sonucumuz ilk 4 değeri es geçersek 5,6,7..10
+    nums.pipe(skip(4)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****skipUntil Operatoru
+ subscription: any;
+
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //skipUntil Skipten farkı içerisindeki method aktif olana kadar önceki işlemleri çalışsa dahi yok sayar.
+    //aşağıdaki örnekte interval değer üretse dahi timer 5 sn olmadan bu değerleri yok sayar ve zamanı gelince sonraki değerleri işler. 4,5,6.. diye yakalar
+    //2. örnek mesela click eventini bağlayalım intervalın değerleri click tuşuna basılmadan değerlendirilmez. Basıldıktan sonra gelen değerleri kullanır.
+
+   const myTimer=interval(1000);//her bir sn bir çalışır ve değerleri ise 0,1,2,...
+
+    myTimer.pipe(skipUntil(timer(5000))).subscribe((data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****skipwhile Operatoru
+subscription: any;
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //skipwhile belirtilen şartı sağlayanları atlayacak. Aşağıdaki 5,6 sonucu verir
+
+    var values = from([1, 2, 3, 4, 5, 6]);
+
+    values.pipe(skipWhile(x=>x<5)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****Take Operatoru
+subscription: any;
+
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //take parametre olarak int değer alır ve dizin içerisinde belirtilen ilk n kadarını alır
+
+    var values = from([1, 2, 3, 4, 5, 6]);
+
+    values.pipe(take(3)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****TakeLast Operatoru
+subscription: any;
+
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //takeLast parametre olarak int değer alır ve dizin içerisinde belirtilen son kadarını alır
+
+    var values = from([1, 2, 3, 4, 5, 6]);
+
+    values.pipe(takeLast(3)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****TakeWhile Operatoru
+subscription: any;
+
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+    //takeWhile dizin içerisinde belirtilen şartı sağlayanlarıalır
+
+    var values = from([1, 2, 3, 4, 5, 6]);
+
+    values.pipe(takeWhile(x=>x<3)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****throttle Operatoru
+subscription: any;
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+   const myInterval = interval(1000);
+    //throttle içerisindeki method çalıştığı andaki datayı alır. Yani ilk 0,3,6,9....
+    myInterval.pipe(throttle(x=>(2000))).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****throttleTime Operatoru
+subscription: any;
+  constructor() {
+    //pipe içerisinde sırasıyla çalışacak absorvable nesneleri barındırır.
+   const myInterval = interval(1000);
+     //throttleTime içerisindeki süreye  çalıştığı andaki datayı alır. Yani ilk 0,3,6,9..... Throttle(methodlar alır) den farkı sadece süre alır
+    myInterval.pipe(throttleTime(2000)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****Map Operatoru
+subscription: any;
+  //Map>gelen datalar üzerinde işlem yapmak için kullanılan methodtur.
+  //Yani hangi datayı işler ve belirttiği dataları yayınlar
+  //Mesela apiden sadece ad alanı gösterilsin desek dahi onu da burada hallederiz
+
+  constructor() {
+    const values = from([1, 2, 3, 4, 5, 6]);
+    values.pipe(map(val=>val+10)).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+
+****MapTo Operatoru
+subscription: any;
+  //MapTo->gelen dataları yayınlamaz sadece verdiği değeri yayınlar
+  //Aşağıdaki örnekte sabitdeğer değerini yayınlar sadece
+
+  constructor() {
+    const values = from([1, 2, 3, 4, 5, 6]);
+    values.pipe(mapTo("sabitdeğer")).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+
+****MergeMap Operatoru
+ subscription: any;
+  //MergeMap->maptan farkı geriye sabit bir değer değil de absorvable değer döner
+  //Absorvable değer döndüğü için döndüğü değerlere de subscribe olabiliyoruz ve iç içe subscribelerden daha efektif yazmış oluruz
+
+  constructor() {
+    const values = of('a', 'b', 'c', 'd', 'e');
+    const nums = of(1, 2);
+
+    values.pipe(mergeMap((val) =>nums.pipe(delay(3000),map((num) => val + num)))).subscribe((data) => {
+          console.log(data);
+          //a1,a2,b1,b2.....e1,e2 çıkan çıktı
+        }
+      );
+  }
+
+
+****SwitchMap Operatoru
+ subscription: any;
+  //SwitchMap->Maptan farkı her yeni veride önceki veriyi es geçip yeni veriyi işliyor
+  constructor() {
+    const values = of('a', 'b', 'c', 'd', 'e');
+    const nums = of(1, 2);
+
+    values.pipe(switchMap((val) =>nums.pipe(delay(1000),map((num) => val + num)))).subscribe(
+        (data) => {
+          console.log(data);
+          //e1,e2 çıkan çıktı
+        }
+      );
+  }
+
+
+****ConcatMap Operatoru
+subscription: any;
+  //ConcatMap->mergeMaptan farkı iç döngü bitince belirtilen gecikme ile yayınlar ardından sonraki döngü bitimini bekler
+
+  constructor() {
+    const values = of('a', 'b', 'c', 'd', 'e');
+    const nums = of(1, 2);
+
+    values.pipe(concatMap((val) =>nums.pipe(delay(1000), map((num) => val + num)))).subscribe(
+        (data) => {
+          console.log(data);
+          //a1,a2 b1,b2 ... e1,e2 her iç döngü bitince bekleme yapar ve yayınlar
+        }
+      );
+  }
+
+
+****toArray Operatoru
+ subscription: any;
+  constructor() {
+  //ToArray->gelen veriyi  arraya çevirir
+    const values = interval(1000)
+
+      values.pipe(skip(3),take(5),toArray()).subscribe(
+        (data) => {
+          console.log(data);
+          //[4,5,6,7,8] değerli dizi oluşturur
+        }
+      );
+  }
+
+****Reduce Operatoru
+ subscription: any;
+  constructor() {
+  //raduce->gelen verileri işler ve tek bir sonuç döner
+  //aşağıdaki örn olduğu gibi 2 parametre ile oluşur acc başlangıçta etkisiz elemandır. Yaptığımız işleme göre sonraki veri geldiğinde değişir.
+  //acc işlemin sonucu yeni değeri olur. Yani aslında aşağıda dizinin elemanlarını topluyoruz
+    const values = of(1,2,3,4,5);
+
+      values.pipe(reduce((acc,val)=>acc+val)).subscribe(
+        //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+        (data) => {
+          console.log(data);
+          //15
+        }
+      );
+  }
+
+****Merge Operatoru
+subscription: any;
+  //merge->içerisine aldığı absorvable datalarını birleştirir
+  constructor() {
+    const myArray = from([1,2,3]);
+    const myNum = of(15);
+    merge(myArray,myNum).subscribe(
+      (data) => {
+        console.log(data);
+        //1,2,3,15
+      }
+    );
+  }
+
+****startWith Operatoru
+subscription: any;
+
+  //startWith->arrayin ilk indexine data koymak için kullanılır
+  constructor() {
+    const myArray = from([1,2,3]);
+
+    myArray.pipe(startWith(4,5,6)).subscribe(
+      (data) => {
+        console.log(data);
+        //4,5,6,1,2,3
+      }
+    );
+  }
+
+****forkJoin Operatoru
+ subscription: any;
+
+  //forkJoin->içerisindeki observablelerin hepsinin birden yayınlamaları bitince hepsinin tüm değerlerini kendisi yayınlıyor
+
+  constructor() {
+
+forkJoin({
+ilkistek: ajax.getJSON<any>("https://jsonplaceholder.typicode.com/todos/1"),
+ikinciistek:ajax.getJSON<any>("https://jsonplaceholder.typicode.com/posts/1")
+}).subscribe(
+      (data) => {
+        console.log(data);
+
+      }
+    );
+  }
+
+****Concat Operatoru
+subscription: any;
+
+  //concat->observable değerler alır. Observable yayınlamaları sırasıyla yapar. Biri bitmeden diğerini yayınlamaz
+
+  constructor() {
+    const values = from([1,2,3,4]);
+    const values2 = from([5,6,7,8]);
+    const values3 = from([9,10,11,12]);
+
+    concat(values,values2,values3).subscribe(
+      (data) => {
+        console.log(data);
+
+      }
+    );
+  }
+
+
+****Tab Operatoru
+ subscription: any;
+
+  //tab->akışı bozmadan dataları kullanma. Örn:Log atma
+
+  constructor() {
+    const values = from([1,2,3,4]);
+
+    values.pipe(tap(val=>console.log(val))).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+
+****delayWhen Operatoru
+ subscription: any;
+
+  //delayWhen->Belirtilen fonksiyon çalışana kadar bekle demek
+  //Aşağıdaki örnekte ekranın herhangi bir yerine tıklayana kadar veri dinleme işi gerçekleşmez
+
+  constructor() {
+    ajax.getJSON<any>('https://jsonplaceholder.typicode.com/todos/1').pipe(delayWhen(val=>fromEvent(document,"click"))).subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+
+****finalize Operatoru
+subscription: any;
+
+  //finalize->pipe içerisinde data çekme işlemi bittikten sonra çalışmasını istediğimiz methodları buraya yazarız. Subscribe 3 methodu bittikten sonra bu method çalışır
+
+  constructor() {
+    ajax
+      .getJSON<any>('https://jsonplaceholder.typicode.com/todos/1')
+      .pipe(
+        finalize(() => console.log('veri alma işleminden bittiden sonra bitti'))
+      )
+      .subscribe(//subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+        (data) => {
+          console.log(data);
+        },
+        (err) => {
+          console.log(err);
+        },
+        () => {
+          console.log('veri alma işlemi bitti');
+        }
+      );
+  }
+
+
+****repeat Operatoru
+subscription: any;
+
+  //repeat->observable'in verilen n kadar tekrar data yayınlamasını sağlar
+
+  constructor() {
+    ajax
+      .getJSON<any>('https://jsonplaceholder.typicode.com/todos/1')
+      .pipe(
+        repeat(4)
+      )
+      .subscribe(
+        (data) => {
+          console.log(data);
+        }
+      );
+  }
+
+****timeOut/catchOut Operatoru
+subscription: any;
+
+  //timeOut->belirtilen sürede data gelirse hata fırlatmaz. Hata fırlatırsa catchError ile yakalarız
+
+  constructor() {
+   const myAjax = ajax
+      .getJSON<any>('https://jsonplaceholder.typicode.com/todos/1')
+      .pipe(
+        delay(4000)
+      );
+
+      myAjax.pipe(timeout(3000),catchError(err=>of("3 sn de data gelmedi"))).subscribe(
+        //subscribe ile 3 fonk çalışır. aldığımız data fonk ,hata fonk ve veri alma işlemi bitince çalışcak fonk
+        (data) => {
+          console.log(data);
+        }
+      );
+  }
+
+
+****retry Operatoru
+ subscription: any;
+
+  //retry->hata meydana gelirse observable n tekrar data almayı dener alamazsa hataya düşer
+
+  constructor() {
+   const myAjax = ajax
+      .getJSON<any>('https://jsonplaceholder.typicode.com/todos/1').pipe(retry(3),catchError(err=>of("3 tekrardas data gelmedi"))).subscribe(
+        (data) => {
+          console.log(data);
+        }
+      );
+  }
+
+
+****retryWhen Operatoru
+ subscription: any;
+
+  //retryWhen->retryden farkı içerisine observable nesne alır. Her seferinde tekrar eder
+
+  constructor() {
+    let myInterval = interval(1000)
+      .pipe(
+        map((val) => {
+          if (val > 6) {
+            throw "değer 6'dan büyük";
+          } else {
+            return val;
+          }
+        })
+      );
+
+      myInterval.pipe(retryWhen(err=>err.pipe(tap(x=>console.log(x))))).subscribe(
+        (data) => {
+          console.log(data);
+        }
+      );
+  }
+
+****Subject Operatoru
+subscription: any;
+
+  //subject->observable nesnelerinin özelleştirilmiş tipidir. Observable nesnelerinin yetersiz kaldığı yerde devreye girerler
+  //İçinde çalıştırdığımız method tüm subscribler için ortaktır. Yani diyelim ki rastgele bir sayı üretiyor. Bunu 10 tane sub
+  //dinliyorsa hepsi aynı veriyi görür ama new observable deseydik her seferinde farklı veri görecektik
+  //Mutlaka next methodundan önce subscribe olması gerekiyor
+  constructor() {
+
+    const myObservable = new Observable(x=>{
+      x.next(Math.random());
+    });
+
+    const myObservableSub = new Subject();
+
+
+
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+    myObservableSub.next(Math.random());
+  }
+
+
+****AsyncSubject Operatoru
+subscription: any;
+
+  //asyncsubject->subscribe olan yapılara en son yayınlanmış olan datayı gönderir.
+  //önemlik olan şu mutlaka complete methodu çalışmış olmalı
+  //aşağıdaki örn. complete 2. DEğer yazanda çalıştığı için 2 si de 2.değer yazısını görür
+  constructor() {
+
+    const myObservableSub = new AsyncSubject();
+
+    myObservableSub.next("1. Değer");
+
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+
+    myObservableSub.next("2. Değer");
+    myObservableSub.complete();
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****BehaviorSubject Operatoru
+subscription: any;
+
+  //behaviorsubject->ilk oluşturulduğu anda mutlaka ilk değeri alır
+  //önce subs sonra subs farketmez hepsine sonraki dataya kadar dataları yayar
+  constructor() {
+
+    const myObservableSub = new BehaviorSubject("Başlangıç Değer");
+
+
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+
+    myObservableSub.next("2. Değer");
+    myObservableSub.complete();
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
+
+****ReplaySubject Operatoru
+subscription: any;
+
+  //replaysubject->subscribe olanlara son yayınlanmış olan n kadar dataları gönderir
+  constructor() {
+    const myObservableSub = new ReplaySubject(3);
+
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+
+    myObservableSub.next("2. Değer");
+    myObservableSub.complete();
+    myObservableSub.subscribe(
+      (data) => {
+        console.log(data);
+      }
+    );
+  }
